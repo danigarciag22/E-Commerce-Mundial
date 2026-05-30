@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getProductById } from '@/lib/products/getProductById'
+import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import type { Product } from '@/lib/products/types'
 
 const cop = new Intl.NumberFormat('es-CO', {
@@ -90,6 +91,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {product.description}
             </p>
           )}
+
+          <AddToCartButton
+            id={product.id}
+            name={product.name}
+            price={product.price}
+            category={product.category}
+            className="mt-2 w-full sm:w-auto"
+          />
 
           <dl className="mt-2 border-t border-border pt-4 text-sm">
             <div className="flex items-center gap-2">
