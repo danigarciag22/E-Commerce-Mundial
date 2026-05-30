@@ -1,19 +1,18 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
+import type { Product, ProductFilters } from './types'
 
-export type Product = {
-  id: string
-  name: string
-  sku: string
-  price: number
-  description: string | null
-  category: string
-}
+export type { Product } from './types'
 
 export async function getProducts(
   client: SupabaseClient<Database>,
+  filters: ProductFilters = {},
 ): Promise<Product[]> {
-  const { data, error } = await client.from('products').select('*')
+  let query = client.from('products').select('*').order('created_at', { ascending: false })
+  if (filters.category) query = query.eq('category', filters.category)
+  if (filters.minPrice !== undefined) query = query.gte('price', filters.minPrice)
+  if (filters.maxPrice !== undefined) query = query.lte('price', filters.maxPrice)
+  const { data, error } = await query
   if (error) throw error
   return (data ?? []).map((row) => ({
     id: row.id,
@@ -21,6 +20,6 @@ export async function getProducts(
     sku: row.sku,
     price: Number(row.price),
     description: row.description,
-    category: row.category,
+    category: row.category as Product['category'],
   }))
 }
