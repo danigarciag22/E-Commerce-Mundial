@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
+import { CartButton } from "@/components/cart/CartButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,9 +45,12 @@ export default function RootLayout({
               </span>
               <span>Tienda Mundial</span>
             </Link>
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Fútbol · 2026
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="hidden text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:inline">
+                Fútbol · 2026
+              </span>
+              <CartButton />
+            </div>
           </div>
         </header>
         <div className="flex flex-1 flex-col">{children}</div>
