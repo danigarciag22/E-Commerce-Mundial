@@ -7,7 +7,12 @@ export async function getProductById(
   id: string,
 ): Promise<Product | null> {
   const { data, error } = await client.from('products').select('*').eq('id', id).maybeSingle()
-  if (error) throw error
+  if (error) {
+    // 22P02 = invalid text representation (e.g. a non-UUID id in the URL).
+    // Treat a malformed id as "not found" rather than a 500.
+    if (error.code === '22P02') return null
+    throw error
+  }
   if (!data) return null
   return {
     id: data.id,
