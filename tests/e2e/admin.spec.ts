@@ -22,7 +22,9 @@ test('admin creates, edits, and deletes a product', async ({ page }) => {
   await expect(page).toHaveURL(/\/admin\/productos/)
   await expect(page.getByText(sku)).toBeVisible()
 
-  const row = page.locator('li', { hasText: sku })
+  // The products list is now an interactive table; delete is confirm()-guarded.
+  page.on('dialog', (dialog) => dialog.accept())
+  const row = page.locator('tr', { hasText: sku })
   await row.getByRole('button', { name: /Eliminar/i }).click()
   await expect(page.getByText(sku)).toHaveCount(0)
 })
