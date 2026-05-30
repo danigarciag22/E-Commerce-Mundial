@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { getMetrics } from '@/lib/metrics/getMetrics'
 
 const cop = new Intl.NumberFormat('es-CO', {
@@ -17,7 +17,9 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 export default async function AdminMetricsPage() {
-  const supabase = createAdminClient()
+  // Admin is authenticated (requireAdmin in layout); RLS admin policies let
+  // this session read all orders + count products — no service-role key needed.
+  const supabase = await createClient()
   const metrics = await getMetrics(supabase)
   return (
     <main>

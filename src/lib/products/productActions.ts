@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/auth/guards'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { validateProductInput } from './validateProductInput'
 import { createProduct, updateProduct, deleteProduct } from './adminProducts'
 
@@ -27,7 +27,7 @@ export async function createProductAction(
   const result = validateProductInput(readForm(formData))
   if (!result.ok) return { errors: result.errors }
   try {
-    await createProduct(createAdminClient(), result.data)
+    await createProduct(await createClient(), result.data)
   } catch {
     return { error: 'No se pudo crear el producto (¿SKU duplicado?)' }
   }
@@ -45,7 +45,7 @@ export async function updateProductAction(
   const result = validateProductInput(readForm(formData))
   if (!result.ok) return { errors: result.errors }
   try {
-    await updateProduct(createAdminClient(), id, result.data)
+    await updateProduct(await createClient(), id, result.data)
   } catch {
     return { error: 'No se pudo actualizar el producto' }
   }
@@ -59,7 +59,7 @@ export async function deleteProductAction(formData: FormData): Promise<void> {
   await requireAdmin()
   const id = String(formData.get('id') ?? '')
   if (!id) return
-  await deleteProduct(createAdminClient(), id)
+  await deleteProduct(await createClient(), id)
   revalidatePath('/admin/productos')
   revalidatePath('/')
 }
