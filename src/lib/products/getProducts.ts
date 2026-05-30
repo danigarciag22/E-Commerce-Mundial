@@ -21,5 +21,7 @@ export async function getProducts(
     price: Number(row.price),
     description: row.description,
     category: row.category as Product['category'],
+    stock: Number(row.stock),
+    active: row.active,
   }))
 }

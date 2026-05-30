@@ -8,6 +8,8 @@ export type Product = {
   price: number
   description: string | null
   category: ProductCategory
+  stock: number
+  active: boolean
 }
 
 export type ProductFilters = {

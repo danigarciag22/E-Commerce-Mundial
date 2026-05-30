@@ -31,11 +31,11 @@ describe('getProducts filters', () => {
 
   it('maps rows and coerces price to number', async () => {
     const client = fakeClient([
-      { id: '1', name: 'Balón', sku: 'B-1', price: '50.00', description: null, category: 'balon', created_at: 'x' },
+      { id: '1', name: 'Balón', sku: 'B-1', price: '50.00', description: null, category: 'balon', stock: '5', active: true, created_at: 'x' },
     ])
     const result = await getProducts(client)
     expect(result).toEqual([
-      { id: '1', name: 'Balón', sku: 'B-1', price: 50, description: null, category: 'balon' },
+      { id: '1', name: 'Balón', sku: 'B-1', price: 50, description: null, category: 'balon', stock: 5, active: true },
     ])
   })
 })
