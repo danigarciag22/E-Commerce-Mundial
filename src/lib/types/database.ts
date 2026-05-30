@@ -35,9 +35,61 @@ export type Database = {
         }
         Relationships: []
       }
+      collections: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      discounts: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          percent: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          percent: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          percent?: number
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
+          customer_email: string | null
           id: string
           items: Json
           payment_intent_id: string | null
@@ -47,6 +99,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          customer_email?: string | null
           id?: string
           items: Json
           payment_intent_id?: string | null
@@ -56,6 +109,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          customer_email?: string | null
           id?: string
           items?: Json
           payment_intent_id?: string | null
@@ -102,8 +156,39 @@ export type Database = {
           },
         ]
       }
+      product_collections: {
+        Row: {
+          collection_id: string
+          product_id: string
+        }
+        Insert: {
+          collection_id: string
+          product_id: string
+        }
+        Update: {
+          collection_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_collections_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_collections_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
+          active: boolean
           category: string
           created_at: string
           description: string | null
@@ -111,8 +196,10 @@ export type Database = {
           name: string
           price: number
           sku: string
+          stock: number
         }
         Insert: {
+          active?: boolean
           category: string
           created_at?: string
           description?: string | null
@@ -120,8 +207,10 @@ export type Database = {
           name: string
           price: number
           sku: string
+          stock?: number
         }
         Update: {
+          active?: boolean
           category?: string
           created_at?: string
           description?: string | null
@@ -129,6 +218,7 @@ export type Database = {
           name?: string
           price?: number
           sku?: string
+          stock?: number
         }
         Relationships: []
       }
