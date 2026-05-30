@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Uniforme (imagen referencial)">
+  <rect width="600" height="600" fill="#f4f4f5"/>
+  <g opacity="0.05">
+    <path d="M0 0 L600 600 M-100 100 L500 700 M100 -100 L700 500" stroke="#18181b" stroke-width="2"/>
+  </g>
+  <path d="M230 180 L180 210 L150 280 L195 305 L215 270 L215 430 L385 430 L385 270 L405 305 L450 280 L420 210 L370 180 L345 210 Q300 245 255 210 Z"
+        fill="#fafafa" stroke="#18181b" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M255 210 Q300 245 345 210" fill="none" stroke="#18181b" stroke-width="5"/>
+  <text x="300" y="500" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" font-weight="600" fill="#a1a1aa">UNIFORME</text>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Botines (imagen referencial)">
+  <rect width="600" height="600" fill="#f4f4f5"/>
+  <g opacity="0.05">
+    <path d="M0 0 L600 600 M-100 100 L500 700 M100 -100 L700 500" stroke="#18181b" stroke-width="2"/>
+  </g>
+  <path d="M150 300 Q150 260 200 258 L300 252 Q360 250 420 285 L450 320 Q455 350 420 352 L180 352 Q150 350 150 320 Z"
+        fill="#fafafa" stroke="#18181b" stroke-width="6" stroke-linejoin="round"/>
+  <g stroke="#18181b" stroke-width="5">
+    <path d="M250 262 L262 300"/>
+    <path d="M285 258 L297 300"/>
+    <path d="M320 260 L332 302"/>
+  </g>
+  <rect x="160" y="352" width="280" height="20" rx="6" fill="#18181b"/>
+  <g fill="#18181b">
+    <circle cx="210" cy="386" r="6"/><circle cx="270" cy="386" r="6"/>
+    <circle cx="330" cy="386" r="6"/><circle cx="390" cy="386" r="6"/>
+  </g>
+  <text x="300" y="500" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" font-weight="600" fill="#a1a1aa">BOTINES</text>
+</svg>

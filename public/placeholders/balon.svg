@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Balón (imagen referencial)">
+  <rect width="600" height="600" fill="#f4f4f5"/>
+  <g opacity="0.05">
+    <path d="M0 0 L600 600 M-100 100 L500 700 M100 -100 L700 500" stroke="#18181b" stroke-width="2"/>
+  </g>
+  <circle cx="300" cy="300" r="150" fill="#fafafa" stroke="#18181b" stroke-width="6"/>
+  <polygon points="300,235 340,265 325,312 275,312 260,265" fill="#18181b"/>
+  <g fill="none" stroke="#18181b" stroke-width="5">
+    <path d="M300 235 L300 185"/>
+    <path d="M340 265 L388 248"/>
+    <path d="M325 312 L358 352"/>
+    <path d="M275 312 L242 352"/>
+    <path d="M260 265 L212 248"/>
+  </g>
+  <text x="300" y="500" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" font-weight="600" fill="#a1a1aa">BALÓN</text>
+</svg>

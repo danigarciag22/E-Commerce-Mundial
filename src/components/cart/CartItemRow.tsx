@@ -2,6 +2,7 @@
 
 import { Minus, Plus } from 'lucide-react'
 import { useCartStore } from '@/lib/cart/cartStore'
+import { placeholderImage } from '@/lib/products/placeholderImage'
 import type { CartItem } from '@/lib/cart/types'
 
 const cop = new Intl.NumberFormat('es-CO', {
@@ -20,7 +21,9 @@ export function CartItemRow({ item }: { item: CartItem }) {
         aria-hidden
         className="relative size-16 shrink-0 overflow-hidden rounded-lg border border-border bg-gradient-to-br from-muted via-card to-muted/40"
       >
-        <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:repeating-linear-gradient(45deg,currentColor_0_1px,transparent_1px_12px)]" />
+        {/* Generic placeholder — Higgsfield render in Fase 2 (see docs/3D-ASSETS.md) */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={placeholderImage(item.category)} alt="" className="absolute inset-0 size-full object-cover" />
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{item.name}</p>

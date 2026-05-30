@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getProductById } from '@/lib/products/getProductById'
+import { placeholderImage } from '@/lib/products/placeholderImage'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import type { Product } from '@/lib/products/types'
 
@@ -67,7 +68,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       <article className="mt-6 grid gap-8 md:grid-cols-2">
         <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-muted via-card to-muted/40">
-          {/* Pitch-line motif — replaced by interactive 3D render in Fase 2 */}
+          {/* Generic category placeholder — replaced by interactive Higgsfield 3D in Fase 2 (see docs/3D-ASSETS.md) */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={placeholderImage(product.category)}
+            alt={`Imagen referencial de ${product.name}`}
+            className="absolute inset-0 size-full object-cover"
+          />
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:repeating-linear-gradient(45deg,currentColor_0_1px,transparent_1px_16px)]"

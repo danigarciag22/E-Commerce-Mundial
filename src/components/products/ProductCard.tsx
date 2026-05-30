@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import type { Product } from '@/lib/products/types'
+import { placeholderImage } from '@/lib/products/placeholderImage'
 import { cn } from '@/lib/utils'
 
 const cop = new Intl.NumberFormat('es-CO', {
@@ -43,6 +44,14 @@ export function ProductCard({ product }: { product: Product }) {
           categoryAccent[product.category],
         )}
       >
+        {/* Generic category placeholder art — replaced by Higgsfield 3D in Fase 2 (see docs/3D-ASSETS.md) */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={placeholderImage(product.category)}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
         {/* Decorative pitch-line motif for World Cup energy */}
         <div
           aria-hidden
