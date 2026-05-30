@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import { CartButton } from "@/components/cart/CartButton";
+import { UserMenu } from "@/components/auth/UserMenu";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -49,6 +50,7 @@ export default function RootLayout({
               <span className="hidden text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:inline">
                 Fútbol · 2026
               </span>
+              <UserMenu />
               <CartButton />
             </div>
           </div>
