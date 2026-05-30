@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { createProduct, updateProduct, deleteProduct } from '@/lib/products/adminProducts'
 import type { ProductInput } from '@/lib/products/validateProductInput'
 
-const input: ProductInput = { name: 'Balón', sku: 'B-1', price: 50000, category: 'balon', description: 'x' }
+const input: ProductInput = { name: 'Balón', sku: 'B-1', price: 50000, category: 'balon', description: 'x', stock: 0, active: false }
 
 function fakeClient() {
   const calls: { op: string; table: string; arg?: unknown; eq?: unknown[] }[] = []

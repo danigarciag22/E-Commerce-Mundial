@@ -16,3 +16,17 @@ export async function deleteProduct(client: SupabaseClient<Database>, id: string
   const { error } = await client.from('products').delete().eq('id', id)
   if (error) throw new Error(error.message)
 }
+
+export async function toggleProductActive(
+  client: SupabaseClient<Database>, id: string, active: boolean,
+): Promise<void> {
+  const { error } = await client.from('products').update({ active }).eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function updateStock(
+  client: SupabaseClient<Database>, id: string, stock: number,
+): Promise<void> {
+  const { error } = await client.from('products').update({ stock }).eq('id', id)
+  if (error) throw new Error(error.message)
+}

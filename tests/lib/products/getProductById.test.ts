@@ -11,9 +11,9 @@ function fakeClient(row: unknown, error: unknown = null) {
 
 describe('getProductById', () => {
   it('returns mapped product when found', async () => {
-    const client = fakeClient({ id: '1', name: 'Balón', sku: 'B-1', price: '50.00', description: 'x', category: 'balon', created_at: 't' })
+    const client = fakeClient({ id: '1', name: 'Balón', sku: 'B-1', price: '50.00', description: 'x', category: 'balon', stock: '10', active: true, created_at: 't' })
     const result = await getProductById(client, '1')
-    expect(result).toEqual({ id: '1', name: 'Balón', sku: 'B-1', price: 50, description: 'x', category: 'balon' })
+    expect(result).toEqual({ id: '1', name: 'Balón', sku: 'B-1', price: 50, description: 'x', category: 'balon', stock: 10, active: true })
   })
 
   it('returns null when not found', async () => {

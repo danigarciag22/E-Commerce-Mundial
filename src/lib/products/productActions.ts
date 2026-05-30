@@ -63,3 +63,26 @@ export async function deleteProductAction(formData: FormData): Promise<void> {
   revalidatePath('/admin/productos')
   revalidatePath('/')
 }
+
+export async function toggleProductActiveAction(formData: FormData): Promise<void> {
+  await requireAdmin()
+  const id = String(formData.get('id') ?? '')
+  const active = String(formData.get('active') ?? '') === 'true'
+  if (!id) return
+  const { toggleProductActive } = await import('./adminProducts')
+  await toggleProductActive(await createClient(), id, active)
+  revalidatePath('/admin/productos')
+  revalidatePath('/')
+}
+
+export async function updateStockAction(formData: FormData): Promise<void> {
+  await requireAdmin()
+  const id = String(formData.get('id') ?? '')
+  const stock = Number(formData.get('stock'))
+  if (!id || !Number.isInteger(stock) || stock < 0) return
+  const { updateStock } = await import('./adminProducts')
+  await updateStock(await createClient(), id, stock)
+  revalidatePath('/admin/inventario')
+  revalidatePath('/admin/productos')
+  revalidatePath('/')
+}

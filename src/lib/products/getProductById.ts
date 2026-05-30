@@ -21,5 +21,7 @@ export async function getProductById(
     price: Number(data.price),
     description: data.description,
     category: data.category as Product['category'],
+    stock: Number(data.stock),
+    active: data.active,
   }
 }
