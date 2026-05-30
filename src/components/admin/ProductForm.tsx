@@ -12,6 +12,8 @@ type Defaults = {
   price?: number | string
   category?: string
   description?: string | null
+  stock?: number | string
+  active?: boolean
 }
 
 const labels: Record<string, string> = {
@@ -104,6 +106,36 @@ export function ProductForm({
           rows={3}
           className={field}
         />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="stock" className="text-sm font-medium">
+          Stock
+        </label>
+        <input
+          id="stock"
+          name="stock"
+          type="number"
+          min="0"
+          defaultValue={d.stock ?? 0}
+          className={field}
+        />
+        {state?.errors?.stock && (
+          <p role="alert" className="text-sm text-destructive">
+            {state.errors.stock}
+          </p>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <input
+          id="active"
+          name="active"
+          type="checkbox"
+          defaultChecked={d.active ?? true}
+          className="size-4 rounded border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        />
+        <label htmlFor="active" className="text-sm font-medium">
+          Producto activo (visible en la tienda)
+        </label>
       </div>
       {state?.error && (
         <p role="alert" className="text-sm text-destructive">

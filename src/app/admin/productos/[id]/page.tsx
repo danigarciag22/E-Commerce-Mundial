@@ -23,6 +23,8 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           price: product.price,
           category: product.category,
           description: product.description,
+          stock: product.stock,
+          active: product.active,
         }}
         submitLabel="Guardar cambios"
       />

@@ -16,6 +16,8 @@ function readForm(formData: FormData) {
     price: String(formData.get('price') ?? ''),
     category: String(formData.get('category') ?? ''),
     description: String(formData.get('description') ?? ''),
+    stock: String(formData.get('stock') ?? ''),
+    active: formData.get('active') === null ? '' : String(formData.get('active')),
   }
 }
 
