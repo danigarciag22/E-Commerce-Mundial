@@ -20,6 +20,19 @@ export default function LoginPage() {
         Accede a tu cuenta para continuar.
       </p>
 
+      {/* TEMP — credenciales admin de prueba. Solo visible en desarrollo.
+          BORRAR antes de producción (no se renderiza si NODE_ENV=production). */}
+      {process.env.NODE_ENV !== 'production' && (
+        <div className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <p className="font-semibold">🔧 Admin de prueba (solo dev)</p>
+          <p className="mt-1 font-mono text-xs">
+            danigarcia222005@gmail.com
+            <br />
+            admin12345
+          </p>
+        </div>
+      )}
+
       <form
         action={formAction}
         className="mt-8 rounded-xl border border-border bg-card p-6 shadow-sm"
