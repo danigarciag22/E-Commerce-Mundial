@@ -6,9 +6,11 @@ export type ProductInput = {
   price: number
   category: ProductCategory
   description: string | null
+  stock: number
+  active: boolean
 }
 
-type RawInput = { name?: string; sku?: string; price?: string; category?: string; description?: string }
+type RawInput = { name?: string; sku?: string; price?: string; category?: string; description?: string; stock?: string; active?: string }
 
 export type ValidationResult =
   | { ok: true; data: ProductInput }
@@ -28,10 +30,23 @@ export function validateProductInput(raw: RawInput): ValidationResult {
   if (!(PRODUCT_CATEGORIES as readonly string[]).includes(category)) {
     errors.category = 'Categoría inválida'
   }
+  const stockRaw = raw.stock ?? ''
+  const stock = stockRaw === '' ? 0 : Number(stockRaw)
+  if (!Number.isInteger(stock) || stock < 0) {
+    errors.stock = 'El stock debe ser un entero ≥ 0'
+  }
   if (Object.keys(errors).length > 0) return { ok: false, errors }
   const description = (raw.description ?? '').trim()
   return {
     ok: true,
-    data: { name, sku, price: priceNum, category: category as ProductCategory, description: description === '' ? null : description },
+    data: {
+      name,
+      sku,
+      price: priceNum,
+      category: category as ProductCategory,
+      description: description === '' ? null : description,
+      stock,
+      active: raw.active === 'on' || raw.active === 'true',
+    },
   }
 }
