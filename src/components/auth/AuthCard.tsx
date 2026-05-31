@@ -2,10 +2,11 @@
 
 import { useActionState, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Check, Eye, EyeOff, Lock, Mail, ShieldCheck, User, X } from 'lucide-react'
+import { Check, Mail, ShieldCheck, User, X } from 'lucide-react'
 import { signIn, signUp, type AuthActionState } from '@/lib/auth/actions'
 import { checkPassword, isEmailValid } from '@/lib/auth/passwordRules'
 import { createClient } from '@/lib/supabase/client'
+import { PasswordInput } from '@/components/auth/PasswordInput'
 import { cn } from '@/lib/utils'
 
 type Tab = 'signin' | 'signup'
@@ -37,50 +38,6 @@ function AppleIcon() {
     <svg viewBox="0 0 24 24" className="size-4 fill-current" aria-hidden>
       <path d="M16.37 12.78c.03 2.92 2.56 3.89 2.59 3.9-.02.07-.4 1.39-1.34 2.75-.8 1.18-1.64 2.35-2.96 2.37-1.3.03-1.72-.77-3.2-.77-1.49 0-1.95.75-3.18.8-1.27.05-2.24-1.27-3.05-2.44-1.65-2.4-2.91-6.77-1.22-9.72.84-1.47 2.34-2.4 3.97-2.42 1.25-.03 2.43.84 3.2.84.76 0 2.2-1.04 3.71-.89.63.03 2.4.26 3.54 1.92-.09.06-2.11 1.24-2.09 3.69M13.94 4.3c.68-.83 1.14-1.98.99-3.13-.98.04-2.17.65-2.88 1.48-.63.73-1.19 1.9-1.04 3.02 1.1.09 2.24-.55 2.93-1.37" />
     </svg>
-  )
-}
-
-// Module-level so React keeps a stable component identity across renders.
-function PasswordInput({
-  id,
-  name,
-  autoComplete,
-  placeholder,
-  value,
-  onChange,
-}: {
-  id: string
-  name: string
-  autoComplete: string
-  placeholder: string
-  value?: string
-  onChange?: (v: string) => void
-}) {
-  const [show, setShow] = useState(false)
-  return (
-    <div className="relative">
-      <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-      <input
-        id={id}
-        name={name}
-        type={show ? 'text' : 'password'}
-        autoComplete={autoComplete}
-        required
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
-        className={cn(inputBase, 'pr-10 border-border focus-visible:border-ring')}
-      />
-      <button
-        type="button"
-        onClick={() => setShow((s) => !s)}
-        aria-label={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-        aria-pressed={show}
-        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        {show ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
-      </button>
-    </div>
   )
 }
 
