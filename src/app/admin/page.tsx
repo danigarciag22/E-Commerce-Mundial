@@ -1,3 +1,4 @@
+import { requirePermission } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import { getDashboardData } from '@/lib/metrics/getDashboardData'
 import { RangeSelector } from '@/components/admin/RangeSelector'
@@ -37,6 +38,7 @@ export default async function AdminDashboard({
 }: {
   searchParams: Promise<{ range?: string }>
 }) {
+  await requirePermission('view_dashboard')
   const { range } = await searchParams
   const days = [7, 30, 90].includes(Number(range)) ? Number(range) : 90
 

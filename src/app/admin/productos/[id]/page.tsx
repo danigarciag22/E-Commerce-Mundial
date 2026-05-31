@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation'
+import { requirePermission } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import { getProductById } from '@/lib/products/getProductById'
 import { ProductForm } from '@/components/admin/ProductForm'
 import { updateProductAction } from '@/lib/products/productActions'
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePermission('manage_products')
   const { id } = await params
   const supabase = await createClient()
   const product = await getProductById(supabase, id)

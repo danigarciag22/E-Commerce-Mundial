@@ -1,3 +1,4 @@
+import { requirePermission } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import { getDiscounts } from '@/lib/discounts/getDiscounts'
 import { DiscountForm } from '@/components/admin/DiscountForm'
@@ -6,6 +7,7 @@ import { toggleDiscountAction, deleteDiscountAction } from '@/lib/discounts/disc
 import { cn } from '@/lib/utils'
 
 export default async function AdminDiscountsPage() {
+  await requirePermission('manage_discounts')
   const supabase = await createClient()
   const discounts = await getDiscounts(supabase)
   return (

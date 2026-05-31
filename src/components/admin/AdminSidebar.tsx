@@ -10,21 +10,34 @@ import {
   Boxes,
   Tag,
   FolderTree,
+  UsersRound,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { can, type Permission } from '@/lib/auth/permissions'
+import type { UserRole } from '@/lib/auth/roles'
 
-const items = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/productos', label: 'Productos', icon: Package },
-  { href: '/admin/ordenes', label: 'Órdenes', icon: ShoppingCart },
-  { href: '/admin/clientes', label: 'Clientes', icon: Users },
-  { href: '/admin/inventario', label: 'Inventario', icon: Boxes },
-  { href: '/admin/descuentos', label: 'Descuentos', icon: Tag },
-  { href: '/admin/colecciones', label: 'Colecciones', icon: FolderTree },
+type NavItem = {
+  href: string
+  label: string
+  icon: typeof LayoutDashboard
+  permission: Permission
+  exact?: boolean
+}
+
+const items: NavItem[] = [
+  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, permission: 'view_dashboard', exact: true },
+  { href: '/admin/productos', label: 'Productos', icon: Package, permission: 'manage_products' },
+  { href: '/admin/ordenes', label: 'Órdenes', icon: ShoppingCart, permission: 'manage_orders' },
+  { href: '/admin/clientes', label: 'Clientes', icon: Users, permission: 'manage_orders' },
+  { href: '/admin/inventario', label: 'Inventario', icon: Boxes, permission: 'manage_inventory' },
+  { href: '/admin/descuentos', label: 'Descuentos', icon: Tag, permission: 'manage_discounts' },
+  { href: '/admin/colecciones', label: 'Colecciones', icon: FolderTree, permission: 'manage_collections' },
+  { href: '/admin/equipo', label: 'Equipo', icon: UsersRound, permission: 'manage_team' },
 ]
 
-export function AdminSidebar() {
+export function AdminSidebar({ role }: { role: UserRole }) {
   const pathname = usePathname()
+  const visible = items.filter((item) => can(role, item.permission))
   return (
     <aside className="hidden w-60 shrink-0 border-r border-border bg-card md:block">
       <div className="sticky top-0 flex h-screen flex-col">
@@ -38,7 +51,7 @@ export function AdminSidebar() {
           CRM
         </Link>
         <nav className="flex flex-1 flex-col gap-1 p-3">
-          {items.map(({ href, label, icon: Icon, exact }) => {
+          {visible.map(({ href, label, icon: Icon, exact }) => {
             const active = exact ? pathname === href : pathname.startsWith(href)
             return (
               <Link

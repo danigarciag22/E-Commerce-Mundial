@@ -1,8 +1,10 @@
+import { requirePermission } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import { getOrders } from '@/lib/orders/getOrders'
 import { OrdersTable } from '@/components/admin/OrdersTable'
 
 export default async function AdminOrdersPage() {
+  await requirePermission('manage_orders')
   const supabase = await createClient()
   const orders = await getOrders(supabase)
   return (

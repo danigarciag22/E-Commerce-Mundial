@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { requirePermission } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import { getCustomerOrders } from '@/lib/customers/getCustomers'
 import { statusLabel, statusColor } from '@/lib/orders/orderStatus'
@@ -7,6 +8,7 @@ import { cn } from '@/lib/utils'
 const cop = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })
 
 export default async function CustomerDetailPage({ params }: { params: Promise<{ email: string }> }) {
+  await requirePermission('manage_orders')
   const { email: raw } = await params
   const email = decodeURIComponent(raw)
   const supabase = await createClient()

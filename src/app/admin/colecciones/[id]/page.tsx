@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { requirePermission } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import { getProducts } from '@/lib/products/getProducts'
 import { getCollection, getAssignedProductIds } from '@/lib/collections/getCollections'
 import { setCollectionProductsAction } from '@/lib/collections/collectionActions'
 
 export default async function CollectionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePermission('manage_collections')
   const { id } = await params
   const supabase = await createClient()
   const collection = await getCollection(supabase, id)

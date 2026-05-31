@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { requirePermission } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import { getCollections } from '@/lib/collections/getCollections'
 import { CollectionForm } from '@/components/admin/CollectionForm'
@@ -6,6 +7,7 @@ import { DeleteButton } from '@/components/admin/DeleteButton'
 import { deleteCollectionAction } from '@/lib/collections/collectionActions'
 
 export default async function AdminCollectionsPage() {
+  await requirePermission('manage_collections')
   const supabase = await createClient()
   const collections = await getCollections(supabase)
   return (

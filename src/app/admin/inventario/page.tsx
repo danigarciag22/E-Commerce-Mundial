@@ -1,3 +1,4 @@
+import { requirePermission } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import { getProducts } from '@/lib/products/getProducts'
 import { StockEditor } from '@/components/admin/StockEditor'
@@ -23,6 +24,7 @@ export default async function InventoryPage({
 }: {
   searchParams: Promise<{ low?: string }>
 }) {
+  await requirePermission('manage_inventory')
   const { low } = await searchParams
   const onlyLow = low === '1'
 

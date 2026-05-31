@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { requirePermission } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import { getOrderById } from '@/lib/orders/getOrderById'
 import { OrderStatusForm } from '@/components/admin/OrderStatusForm'
@@ -9,6 +10,7 @@ import { cn } from '@/lib/utils'
 const cop = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePermission('manage_orders')
   const { id } = await params
   const supabase = await createClient()
   const order = await getOrderById(supabase, id)
