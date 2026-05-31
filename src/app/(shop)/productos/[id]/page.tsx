@@ -4,8 +4,13 @@ import { ArrowLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getProductById } from '@/lib/products/getProductById'
-import { placeholderImage } from '@/lib/products/placeholderImage'
+import { getProducts } from '@/lib/products/getProducts'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
+import { ProductGallery } from '@/components/products/ProductGallery'
+import { SizeSelector } from '@/components/products/SizeSelector'
+import { TrustBadges } from '@/components/products/TrustBadges'
+import { ProductReviews } from '@/components/products/ProductReviews'
+import { RelatedProducts } from '@/components/products/RelatedProducts'
 import type { Product } from '@/lib/products/types'
 
 const cop = new Intl.NumberFormat('es-CO', {
@@ -20,6 +25,8 @@ const categoryLabel: Record<Product['category'], string> = {
   balon: 'Balón',
   merchandising: 'Merch',
 }
+
+const INSTALLMENTS = 3
 
 // Next.js 16: params is async (a Promise) and must be awaited.
 type ProductPageProps = {
@@ -56,8 +63,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   if (!product) notFound()
 
+  // "Completa el look": surface other catalog items as cross-sell suggestions.
+  const related = (await getProducts(supabase))
+    .filter((p) => p.id !== product.id)
+    .slice(0, 3)
+
+  const installment = Math.round(product.price / INSTALLMENTS)
+
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+    <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <Link
         href="/"
         className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -66,32 +80,32 @@ export default async function ProductPage({ params }: ProductPageProps) {
         Volver al catálogo
       </Link>
 
-      <article className="mt-6 grid gap-8 md:grid-cols-2">
-        <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-muted via-card to-muted/40">
-          {/* Generic category placeholder — replaced by interactive Higgsfield 3D in Fase 2 (see docs/3D-ASSETS.md) */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={placeholderImage(product.category)}
-            alt={`Imagen referencial de ${product.name}`}
-            className="absolute inset-0 size-full object-cover"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:repeating-linear-gradient(45deg,currentColor_0_1px,transparent_1px_16px)]"
-          />
-          <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary-foreground shadow-sm">
-            {categoryLabel[product.category]}
-          </span>
-        </div>
+      <article className="mt-6 grid gap-10 md:grid-cols-2">
+        <ProductGallery
+          category={product.category}
+          name={product.name}
+          badge={categoryLabel[product.category]}
+        />
 
-        <div className="flex flex-col gap-4">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            {product.name}
-          </h1>
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              {product.name}
+            </h1>
+          </div>
 
-          <p className="text-3xl font-bold tabular-nums text-foreground">
-            {cop.format(product.price)}
-          </p>
+          <div className="flex flex-col gap-1">
+            <p className="text-3xl font-bold tabular-nums text-foreground">
+              {cop.format(product.price)}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              O {INSTALLMENTS} cuotas de{' '}
+              <span className="font-semibold text-foreground tabular-nums">
+                {cop.format(installment)}
+              </span>{' '}
+              sin interés.
+            </p>
+          </div>
 
           {product.description && (
             <p className="text-base leading-relaxed text-muted-foreground">
@@ -99,13 +113,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </p>
           )}
 
+          <div className="mt-1 border-t border-border pt-5">
+            <SizeSelector />
+          </div>
+
           <AddToCartButton
             id={product.id}
             name={product.name}
             price={product.price}
             category={product.category}
-            className="mt-2 w-full sm:w-auto"
+            className="mt-1 w-full"
           />
+
+          <TrustBadges />
 
           <dl className="mt-2 border-t border-border pt-4 text-sm">
             <div className="flex items-center gap-2">
@@ -115,6 +135,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </dl>
         </div>
       </article>
+
+      <ProductReviews />
+
+      <RelatedProducts products={related} />
     </main>
   )
 }
