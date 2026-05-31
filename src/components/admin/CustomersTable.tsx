@@ -9,6 +9,28 @@ import { cn } from '@/lib/utils'
 const cop = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })
 const PAGE_SIZE = 15
 
+// Module-level so React keeps a stable component identity across renders
+// (defining it inside CustomersTable would remount the header every render).
+function SortBtn({
+  label,
+  k,
+  sortKey,
+  sortDir,
+  onSort,
+}: {
+  label: string
+  k: keyof Customer
+  sortKey: keyof Customer
+  sortDir: SortDir
+  onSort: (k: keyof Customer) => void
+}) {
+  return (
+    <button type="button" onClick={() => onSort(k)} className="inline-flex items-center gap-1 hover:text-foreground">
+      {label}{sortKey === k && <span>{sortDir === 'asc' ? '▲' : '▼'}</span>}
+    </button>
+  )
+}
+
 export function CustomersTable({ customers }: { customers: Customer[] }) {
   const [search, setSearch] = useState('')
   const [sortKey, setSortKey] = useState<keyof Customer>('totalSpent')
@@ -22,11 +44,6 @@ export function CustomersTable({ customers }: { customers: Customer[] }) {
     else { setSortKey(key); setSortDir('desc') }
     setPage(1)
   }
-  const SortBtn = ({ label, k }: { label: string; k: keyof Customer }) => (
-    <button type="button" onClick={() => toggleSort(k)} className="inline-flex items-center gap-1 hover:text-foreground">
-      {label}{sortKey === k && <span>{sortDir === 'asc' ? '▲' : '▼'}</span>}
-    </button>
-  )
 
   return (
     <div className="flex flex-col gap-4">
@@ -42,8 +59,8 @@ export function CustomersTable({ customers }: { customers: Customer[] }) {
             <tr>
               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Email</th>
               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tipo</th>
-              <th className="px-3 py-2 text-left font-medium text-muted-foreground"><SortBtn label="Órdenes" k="orders" /></th>
-              <th className="px-3 py-2 text-left font-medium text-muted-foreground"><SortBtn label="Gasto" k="totalSpent" /></th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground"><SortBtn label="Órdenes" k="orders" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} /></th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground"><SortBtn label="Gasto" k="totalSpent" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} /></th>
               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Última orden</th>
               <th className="px-3 py-2" />
             </tr>

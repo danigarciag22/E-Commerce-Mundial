@@ -15,6 +15,39 @@ const cop = new Intl.NumberFormat('es-CO', {
 })
 const PAGE_SIZE = 10
 
+// Module-level so React keeps a stable component identity across renders
+// (defining it inside ProductsTable would remount the header every render).
+function Th({
+  label,
+  k,
+  sortKey,
+  sortDir,
+  onSort,
+}: {
+  label: string
+  k?: keyof Product
+  sortKey?: keyof Product
+  sortDir?: SortDir
+  onSort?: (k: keyof Product) => void
+}) {
+  return (
+    <th className="px-3 py-2 text-left font-medium text-muted-foreground">
+      {k ? (
+        <button
+          type="button"
+          onClick={() => onSort?.(k)}
+          className="inline-flex items-center gap-1 rounded hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {label}
+          {sortKey === k && <span aria-hidden>{sortDir === 'asc' ? '▲' : '▼'}</span>}
+        </button>
+      ) : (
+        label
+      )}
+    </th>
+  )
+}
+
 export function ProductsTable({ products }: { products: Product[] }) {
   const [search, setSearch] = useState('')
   const [sortKey, setSortKey] = useState<keyof Product>('name')
@@ -38,23 +71,6 @@ export function ProductsTable({ products }: { products: Product[] }) {
     }
     setPage(1)
   }
-
-  const Th = ({ label, k }: { label: string; k?: keyof Product }) => (
-    <th className="px-3 py-2 text-left font-medium text-muted-foreground">
-      {k ? (
-        <button
-          type="button"
-          onClick={() => toggleSort(k)}
-          className="inline-flex items-center gap-1 rounded hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {label}
-          {sortKey === k && <span aria-hidden>{sortDir === 'asc' ? '▲' : '▼'}</span>}
-        </button>
-      ) : (
-        label
-      )}
-    </th>
-  )
 
   return (
     <div className="flex flex-col gap-4">
@@ -81,11 +97,11 @@ export function ProductsTable({ products }: { products: Product[] }) {
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr>
-              <Th label="Nombre" k="name" />
+              <Th label="Nombre" k="name" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
               <Th label="SKU" />
               <Th label="Categoría" />
-              <Th label="Precio" k="price" />
-              <Th label="Stock" k="stock" />
+              <Th label="Precio" k="price" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <Th label="Stock" k="stock" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
               <Th label="Estado" />
               <Th label="" />
             </tr>
