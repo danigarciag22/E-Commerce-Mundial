@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { CartButton } from '@/components/cart/CartButton'
 import { UserMenu } from '@/components/auth/UserMenu'
+import { SearchBar } from '@/components/storefront/SearchBar'
 
 export function SiteHeader() {
   return (
@@ -14,6 +15,7 @@ export function SiteHeader() {
           <Link href="/" className="hover:text-foreground">Productos</Link>
           <Link href="/colecciones" className="hover:text-foreground">Colecciones</Link>
         </nav>
+        <SearchBar />
         <div className="ml-auto flex items-center gap-3">
           <CartButton />
           <UserMenu />
