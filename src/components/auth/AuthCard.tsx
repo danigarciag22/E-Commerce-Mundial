@@ -60,8 +60,15 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
   const router = useRouter()
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [info, setInfo] = useState<string | null>(null)
 
   const isSignup = tab === 'signup'
+
+  function switchTab(t: Tab) {
+    setTab(t)
+    setError(null)
+    setInfo(null)
+  }
 
   // Autofocus the email field on first render and whenever the tab switches.
   useEffect(() => {
@@ -78,13 +85,14 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
     const passwordV = String(fd.get('password') ?? '')
     const supabase = createClient()
     setError(null)
+    setInfo(null)
 
     if (isSignup) {
       const fullName = String(fd.get('full_name') ?? '').trim()
       if (!fullName) return setError('Ingresa tu nombre completo')
       if (!isPasswordValid(passwordV)) return setError('La contraseña no cumple los requisitos mínimos')
       setPending(true)
-      const { error: err } = await supabase.auth.signUp({
+      const { data, error: err } = await supabase.auth.signUp({
         email: emailV,
         password: passwordV,
         options: { data: { full_name: fullName } },
@@ -92,6 +100,12 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
       if (err) {
         setPending(false)
         return setError('No se pudo crear la cuenta. ¿Ya existe?')
+      }
+      // Email confirmation enabled → no session yet. Don't fake a login;
+      // tell the user to confirm via email.
+      if (!data.session) {
+        setPending(false)
+        return setInfo('¡Cuenta creada! Te enviamos un correo para confirmar tu cuenta. Revísalo (y la carpeta de spam) para activar tu acceso.')
       }
     } else {
       setPending(true)
@@ -162,7 +176,7 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
         />
         <button
           type="button"
-          onClick={() => setTab('signin')}
+          onClick={() => switchTab('signin')}
           aria-pressed={!isSignup}
           className={cn(
             'relative z-10 rounded-full py-2 transition-colors focus-visible:outline-none',
@@ -173,7 +187,7 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
         </button>
         <button
           type="button"
-          onClick={() => setTab('signup')}
+          onClick={() => switchTab('signup')}
           aria-pressed={isSignup}
           className={cn(
             'relative z-10 rounded-full py-2 transition-colors focus-visible:outline-none',
@@ -351,6 +365,12 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
           </p>
         )}
 
+        {info && (
+          <p role="status" className="rounded-lg bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-500">
+            {info}
+          </p>
+        )}
+
         <button
           type="submit"
           disabled={pending}
@@ -379,7 +399,7 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
             ¿No tienes cuenta?{' '}
             <button
               type="button"
-              onClick={() => setTab('signup')}
+              onClick={() => switchTab('signup')}
               className="rounded-sm font-medium text-foreground underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Regístrate gratis
