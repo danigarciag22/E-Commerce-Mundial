@@ -1,12 +1,10 @@
 import Link from 'next/link'
-import { getUser } from '@/lib/auth/getUser'
+import type { AuthUser } from '@/lib/auth/getUser'
 import { signOut } from '@/lib/auth/actions'
 import { isAdmin } from '@/lib/auth/roles'
 import { AuthTrigger } from '@/components/auth/AuthTrigger'
 
-export async function UserMenu() {
-  const user = await getUser()
-
+export function UserMenu({ user }: { user: AuthUser | null }) {
   if (!user) {
     return <AuthTrigger />
   }

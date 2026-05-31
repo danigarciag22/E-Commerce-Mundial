@@ -23,6 +23,27 @@ export function subtotalOf(items: CartItem[]): number {
   return items.reduce((n, i) => n + i.price * i.quantity, 0)
 }
 
+// Free-shipping incentive shown in the cart drawer + applied at checkout.
+// Owner can tune both values here.
+export const FREE_SHIPPING_THRESHOLD = 200_000
+export const SHIPPING_COST = 15_000
+
+/** Shipping fee for a given subtotal (free once the threshold is reached). */
+export function shippingFor(subtotal: number): number {
+  return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
+}
+
+/** Pesos still needed to unlock free shipping (0 once reached). */
+export function freeShippingRemaining(subtotal: number): number {
+  return Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
+}
+
+/** Progress 0..1 toward free shipping. */
+export function freeShippingProgress(subtotal: number): number {
+  if (FREE_SHIPPING_THRESHOLD <= 0) return 1
+  return Math.min(1, Math.max(0, subtotal / FREE_SHIPPING_THRESHOLD))
+}
+
 /** Highest tier already unlocked by the current subtotal (or null). */
 export function unlockedTier(subtotal: number): RewardTier | null {
   let best: RewardTier | null = null

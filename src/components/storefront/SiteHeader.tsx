@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { CartButton } from '@/components/cart/CartButton'
+import { CartDrawer } from '@/components/cart/CartDrawer'
 import { UserMenu } from '@/components/auth/UserMenu'
 import { SearchBar } from '@/components/storefront/SearchBar'
+import type { AuthUser } from '@/lib/auth/getUser'
 
-export function SiteHeader() {
+export function SiteHeader({ user }: { user: AuthUser | null }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
@@ -17,8 +18,8 @@ export function SiteHeader() {
         </nav>
         <SearchBar />
         <div className="ml-auto flex items-center gap-3">
-          <CartButton />
-          <UserMenu />
+          <CartDrawer />
+          <UserMenu user={user} />
         </div>
       </div>
     </header>

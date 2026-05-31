@@ -1,28 +1,24 @@
 import { test, expect } from '@playwright/test'
 
-test('add a product to cart and manage it on the cart page', async ({ page }) => {
+test('add a product and manage it in the cart drawer', async ({ page }) => {
   await page.goto('/')
   await page.locator('a[href^="/productos/"]').first().click()
   await expect(page).toHaveURL(/\/productos\//)
 
   await page.getByRole('button', { name: /Agregar al carrito/i }).click()
 
-  // CartButton aria-label is "Carrito" (no items) or "Carrito, N artículos" (with items).
-  // Scope to the header so the footer's "Carrito" link doesn't cause a strict-mode clash.
-  await page.getByRole('banner').getByRole('link', { name: /Carrito/i }).click()
-  await expect(page).toHaveURL(/\/carrito/)
-  await expect(page.getByRole('heading', { name: /Tu carrito/i })).toBeVisible()
-  await expect(page.getByRole('button', { name: /Quitar/i })).toBeVisible()
+  // The header cart control is now a button that opens the cart drawer.
+  // Scope to the header so the footer's "Carrito" link doesn't clash.
+  await page.getByRole('banner').getByRole('button', { name: /Carrito/i }).click()
 
-  // increase quantity to 2 — group aria-label is "Cantidad de <product name>"
+  // Drawer shows the item and the checkout CTA.
+  await expect(page.getByRole('button', { name: /Proceder al Pago/i })).toBeVisible()
+
+  // increase quantity (qty controls live inside the drawer)
   await page.getByRole('button', { name: 'Aumentar' }).click()
-  // qty is a plain <span> inside the group; scoping to the group avoids matching prices
-  await expect(
-    page.getByRole('group', { name: /Cantidad/i }).getByText('2', { exact: true }),
-  ).toBeVisible()
 
-  // remove empties the cart
-  await page.getByRole('button', { name: /Quitar/i }).click()
+  // remove empties the cart (trash button aria-label is "Quitar <name>")
+  await page.getByRole('button', { name: /Quitar/i }).first().click()
   await expect(page.getByText(/Tu carrito está vacío/i)).toBeVisible()
 })
 

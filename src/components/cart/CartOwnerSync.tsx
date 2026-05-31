@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useCartStore } from '@/lib/cart/cartStore'
+import { useWishlistStore } from '@/lib/wishlist/wishlistStore'
 
 // Reconciles cart ownership on every load / auth change:
 // - guest cart is claimed (merged) on first login
@@ -10,8 +11,9 @@ import { useCartStore } from '@/lib/cart/cartStore'
 // sign-out happened (no reliance on client auth events).
 export function CartOwnerSync({ userId }: { userId: string | null }) {
   useEffect(() => {
-    // Calling a zustand action (not React setState) — safe inside an effect.
+    // Calling zustand actions (not React setState) — safe inside an effect.
     useCartStore.getState().reconcileOwner(userId)
+    useWishlistStore.getState().reconcileOwner(userId)
   }, [userId])
 
   return null

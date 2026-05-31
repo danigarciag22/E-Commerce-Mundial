@@ -1,16 +1,16 @@
 'use client'
 
-import { useActionState, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Check, Mail, ShieldCheck, User, X } from 'lucide-react'
-import { signIn, signUp, type AuthActionState } from '@/lib/auth/actions'
-import { checkPassword, isEmailValid } from '@/lib/auth/passwordRules'
+import { checkPassword, isEmailValid, isPasswordValid } from '@/lib/auth/passwordRules'
 import { createClient } from '@/lib/supabase/client'
 import { PasswordInput } from '@/components/auth/PasswordInput'
 import { cn } from '@/lib/utils'
 
 type Tab = 'signin' | 'signup'
-type OAuthProvider = 'google' | 'apple'
+type OAuthProvider = 'google' | 'apple' | 'facebook'
 
 type Props = {
   defaultTab?: Tab
@@ -41,6 +41,14 @@ function AppleIcon() {
   )
 }
 
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
+      <path fill="#1877F2" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.93v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.08 24 18.09 24 12.07Z" />
+    </svg>
+  )
+}
+
 export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) {
   const [tab, setTab] = useState<Tab>(defaultTab)
   const [email, setEmail] = useState('')
@@ -49,18 +57,56 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null)
 
   const emailRef = useRef<HTMLInputElement>(null)
-  const [signInState, signInAction, signInPending] = useActionState<AuthActionState, FormData>(signIn, null)
-  const [signUpState, signUpAction, signUpPending] = useActionState<AuthActionState, FormData>(signUp, null)
+  const router = useRouter()
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const isSignup = tab === 'signup'
-  const action = isSignup ? signUpAction : signInAction
-  const state = isSignup ? signUpState : signInState
-  const pending = isSignup ? signUpPending : signInPending
 
   // Autofocus the email field on first render and whenever the tab switches.
   useEffect(() => {
     emailRef.current?.focus()
   }, [tab])
+
+  // Client-side auth so the modal closes instantly on success (a server action
+  // redirect to the same route would leave the modal open). The /login page
+  // reuses this card too; router.push(next) takes it home afterwards.
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    const emailV = String(fd.get('email') ?? '')
+    const passwordV = String(fd.get('password') ?? '')
+    const supabase = createClient()
+    setError(null)
+
+    if (isSignup) {
+      const fullName = String(fd.get('full_name') ?? '').trim()
+      if (!fullName) return setError('Ingresa tu nombre completo')
+      if (!isPasswordValid(passwordV)) return setError('La contraseña no cumple los requisitos mínimos')
+      setPending(true)
+      const { error: err } = await supabase.auth.signUp({
+        email: emailV,
+        password: passwordV,
+        options: { data: { full_name: fullName } },
+      })
+      if (err) {
+        setPending(false)
+        return setError('No se pudo crear la cuenta. ¿Ya existe?')
+      }
+    } else {
+      setPending(true)
+      const { error: err } = await supabase.auth.signInWithPassword({ email: emailV, password: passwordV })
+      if (err) {
+        setPending(false)
+        return setError('Correo o contraseña incorrectos')
+      }
+    }
+
+    // Success: close the modal and refresh server components to reflect auth.
+    onClose?.()
+    router.push(next)
+    router.refresh()
+  }
 
   const emailValid = isEmailValid(email)
   const emailError = emailTouched && email.length > 0 && !emailValid
@@ -158,6 +204,15 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
           <AppleIcon />
           {oauthLoading === 'apple' ? 'Conectando…' : 'Continuar con Apple'}
         </button>
+        <button
+          type="button"
+          onClick={() => handleOAuth('facebook')}
+          disabled={oauthLoading !== null}
+          className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl border border-border bg-background text-sm font-medium transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+        >
+          <FacebookIcon />
+          {oauthLoading === 'facebook' ? 'Conectando…' : 'Continuar con Facebook'}
+        </button>
       </div>
 
       <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
@@ -167,9 +222,7 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
       </div>
 
       {/* Animated form region */}
-      <form key={tab} action={action} className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-        <input type="hidden" name="next" value={next} />
-
+      <form key={tab} onSubmit={handleSubmit} className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
         {isSignup && (
           <div className="flex flex-col gap-1.5">
             <label htmlFor="full_name" className="text-sm font-medium">Nombre completo</label>
@@ -292,9 +345,9 @@ export function AuthCard({ defaultTab = 'signin', next = '/', onClose }: Props) 
           </label>
         )}
 
-        {state?.error && (
+        {error && (
           <p role="alert" className="rounded-lg bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
-            {state.error}
+            {error}
           </p>
         )}
 
