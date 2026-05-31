@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { useCartStore } from '@/lib/cart/cartStore'
+import { useHydrated } from '@/lib/hooks/useHydrated'
 import { CartItemRow } from '@/components/cart/CartItemRow'
 
 const cop = new Intl.NumberFormat('es-CO', {
@@ -13,8 +13,7 @@ const cop = new Intl.NumberFormat('es-CO', {
 })
 
 export default function CartPage() {
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+  const mounted = useHydrated()
   const items = useCartStore((s) => s.items)
   const total = useCartStore((s) =>
     s.items.reduce((n, i) => n + i.price * i.quantity, 0),

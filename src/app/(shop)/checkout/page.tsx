@@ -1,11 +1,13 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
+import { startTransition, useActionState, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Sparkles } from 'lucide-react'
 import { useCartStore } from '@/lib/cart/cartStore'
+import { useHydrated } from '@/lib/hooks/useHydrated'
 import { checkDiscountAction } from '@/lib/discounts/checkDiscountAction'
 import { applyDiscountToItems } from '@/lib/discounts/discountMath'
+import { subtotalOf, unlockedTier } from '@/lib/cart/promos'
 import { cn } from '@/lib/utils'
 
 const cop = new Intl.NumberFormat('es-CO', {
@@ -15,8 +17,7 @@ const cop = new Intl.NumberFormat('es-CO', {
 })
 
 export default function CheckoutPage() {
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+  const mounted = useHydrated()
 
   const items = useCartStore((s) => s.items)
 
@@ -24,11 +25,24 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [discount, setDiscount] = useState<{ code: string; percent: number } | null>(null)
   const [codeState, codeAction, codePending] = useActionState(checkDiscountAction, null)
+  // Derive the applied discount straight from the action result — no effect /
+  // mirror state needed (covers both manual codes and the auto-applied reward).
+  const discount = codeState?.ok ? { code: codeState.code, percent: codeState.percent } : null
+
+  // Auto-apply the reward unlocked by the cart subtotal (same tiers the promo
+  // popup advertises). The server action re-validates the code, so an expired
+  // or missing code just yields no discount. Runs once per unlocked code.
+  const autoAppliedCode = useRef<string | null>(null)
+  const reward = mounted ? unlockedTier(subtotalOf(items)) : null
   useEffect(() => {
-    if (codeState?.ok) setDiscount({ code: codeState.code, percent: codeState.percent })
-  }, [codeState])
+    if (!reward || codeState?.ok || codePending) return
+    if (autoAppliedCode.current === reward.code) return
+    autoAppliedCode.current = reward.code
+    const fd = new FormData()
+    fd.set('code', reward.code)
+    startTransition(() => codeAction(fd))
+  }, [reward, codeState, codePending, codeAction])
 
   const preview = applyDiscountToItems(items, discount?.percent ?? 0)
 
@@ -43,7 +57,7 @@ export default function CheckoutPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Error al iniciar el pago')
-      window.location.href = data.init_point
+      window.location.assign(data.init_point)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error al iniciar el pago')
       setLoading(false)
@@ -97,6 +111,13 @@ export default function CheckoutPage() {
           placeholder="tu@correo.com"
           className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
+
+        {reward && discount?.code === reward.code && (
+          <p className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-amber-400/10 px-3 py-2 text-sm font-medium text-amber-700 dark:text-amber-400">
+            <Sparkles className="size-4 shrink-0" aria-hidden />
+            Recompensa automática aplicada: {reward.label} por tu compra
+          </p>
+        )}
 
         <form action={codeAction} className="mt-6 border-t border-border pt-4">
           <label className="block text-sm font-medium" htmlFor="code">
