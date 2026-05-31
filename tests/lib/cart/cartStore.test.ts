@@ -8,6 +8,8 @@ const product: Omit<CartItem, 'quantity'> = {
 
 beforeEach(() => {
   useCartStore.getState().clear()
+  useCartStore.getState().reconcileOwner(null)
+  useCartStore.setState({ ownerId: null })
   localStorage.clear()
 })
 
@@ -50,5 +52,37 @@ describe('cartStore', () => {
     const { addItem, clear } = useCartStore.getState()
     addItem(product); clear()
     expect(useCartStore.getState().items).toEqual([])
+  })
+
+  describe('reconcileOwner', () => {
+    it('claims a guest cart on first login, keeping items (merge)', () => {
+      useCartStore.getState().addItem(product)
+      useCartStore.getState().reconcileOwner('user-a')
+      expect(useCartStore.getState().ownerId).toBe('user-a')
+      expect(useCartStore.getState().items).toHaveLength(1)
+    })
+
+    it('clears the cart on logout (owner -> null)', () => {
+      useCartStore.getState().addItem(product)
+      useCartStore.getState().reconcileOwner('user-a')
+      useCartStore.getState().reconcileOwner(null)
+      expect(useCartStore.getState().ownerId).toBeNull()
+      expect(useCartStore.getState().items).toEqual([])
+    })
+
+    it('clears the cart when a different user logs in', () => {
+      useCartStore.getState().addItem(product)
+      useCartStore.getState().reconcileOwner('user-a')
+      useCartStore.getState().reconcileOwner('user-b')
+      expect(useCartStore.getState().ownerId).toBe('user-b')
+      expect(useCartStore.getState().items).toEqual([])
+    })
+
+    it('is a no-op when the same user reloads', () => {
+      useCartStore.getState().addItem(product)
+      useCartStore.getState().reconcileOwner('user-a')
+      useCartStore.getState().reconcileOwner('user-a')
+      expect(useCartStore.getState().items).toHaveLength(1)
+    })
   })
 })
