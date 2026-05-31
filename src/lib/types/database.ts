@@ -16,20 +16,26 @@ export type Database = {
     Tables: {
       app_users: {
         Row: {
+          avatar_url: string | null
           created_at: string
           email: string
+          full_name: string | null
           id: string
           role: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           email: string
+          full_name?: string | null
           id: string
           role?: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           email?: string
+          full_name?: string | null
           id?: string
           role?: string
         }
@@ -227,7 +233,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      crm_role: { Args: Record<PropertyKey, never>; Returns: string }
+      is_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
