@@ -46,6 +46,11 @@ Mientras no estén configurados, los botones redirigen a `/login?error=oauth` (m
 - [ ] **Persistir datos de Entrega** — el formulario de envío (nombre/dirección/ciudad/teléfono) es front-end only; no se guarda en la orden. Definir si se persiste en `orders` o se delega a MP. Tabla `orders` no tiene columnas de dirección hoy.
 - [ ] **Umbral de envío gratis** — `FREE_SHIPPING_THRESHOLD` ($200k) y `SHIPPING_COST` ($15k) en `src/lib/cart/promos.ts`. Ajustar a gusto.
 
+## Newsletter / marketing
+
+- [ ] **Persistir suscriptores** — el popup de bienvenida (`NewsletterModal`) captura el email pero NO lo guarda; marca `// TODO: POST /api/newsletter`. Crear endpoint + tabla `subscribers` (o integrar Mailchimp/Resend Audiences).
+- [ ] **Código de bienvenida** — `WELCOME_CODE` = `MUNDIAL10` (10%) en `NewsletterModal.tsx`, reusa un descuento activo existente. Cambiar/crear uno dedicado (ej. BIENVENIDA10) si se quiere separar métricas.
+
 ---
 
 ## Deploy / pagos

@@ -4,6 +4,7 @@ import { CartPromoPopup } from '@/components/cart/CartPromoPopup'
 import { CartOwnerSync } from '@/components/cart/CartOwnerSync'
 import { AuthProvider } from '@/components/auth/AuthContext'
 import { AuthModalHost } from '@/components/auth/AuthModalHost'
+import { NewsletterModal } from '@/components/marketing/NewsletterModal'
 import { getUser } from '@/lib/auth/getUser'
 
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {
@@ -19,6 +20,7 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
         <CartPromoPopup />
         <CartOwnerSync userId={userId} />
         <AuthModalHost />
+        <NewsletterModal />
       </div>
     </AuthProvider>
   )
