@@ -17,14 +17,13 @@ type WishlistState = {
   ownerId: string | null
   toggle: (item: WishlistItem) => void
   remove: (id: string) => void
-  has: (id: string) => boolean
   clear: () => void
   reconcileOwner: (userId: string | null) => void
 }
 
 export const useWishlistStore = create<WishlistState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       items: [],
       ownerId: null,
       toggle: (item) =>
@@ -34,7 +33,6 @@ export const useWishlistStore = create<WishlistState>()(
             : { items: [...state.items, item] },
         ),
       remove: (id) => set((state) => ({ items: state.items.filter((i) => i.id !== id) })),
-      has: (id) => get().items.some((i) => i.id === id),
       clear: () => set({ items: [] }),
       reconcileOwner: (userId) =>
         set((state) => {

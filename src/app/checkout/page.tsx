@@ -98,7 +98,9 @@ export default function CheckoutPage() {
   }, [promoCode, codeState, codeAction])
 
   const preview = applyDiscountToItems(items, discount?.percent ?? 0)
-  const shipping = shippingFor(preview.total)
+  // Free shipping is based on the merchandise subtotal (pre-discount), matching
+  // the cart drawer's progress bar — so a coupon never silently adds shipping.
+  const shipping = shippingFor(preview.subtotal)
   const total = preview.total + shipping
 
   async function handlePay() {
@@ -108,7 +110,7 @@ export default function CheckoutPage() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, email, code: discount?.code ?? '', shipping }),
+        body: JSON.stringify({ items, email, code: discount?.code ?? '' }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Error al iniciar el pago')

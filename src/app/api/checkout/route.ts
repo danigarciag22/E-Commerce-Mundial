@@ -45,9 +45,11 @@ export async function POST(request: Request) {
     // invalid code → silently ignore (no discount); the page already previews validity
   }
 
-  // Recompute shipping server-side from the final total — never trust the client.
-  const finalTotal = finalItems.reduce((n, i) => n + i.price * i.quantity, 0)
-  const shipping = shippingFor(finalTotal)
+  // Recompute shipping server-side (never trust the client) from the
+  // merchandise subtotal BEFORE discount, matching the cart drawer + checkout
+  // summary so a coupon never silently re-adds shipping.
+  const grossSubtotal = items.reduce((n, i) => n + i.price * i.quantity, 0)
+  const shipping = shippingFor(grossSubtotal)
 
   try {
     const client = new MercadoPagoConfig({ accessToken })
