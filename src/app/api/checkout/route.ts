@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { MercadoPagoConfig, Preference } from 'mercadopago'
 import { buildPreference } from '@/lib/checkout/buildPreference'
+import { validateDiscountCode } from '@/lib/discounts/validateDiscountCode'
+import { applyDiscountToItems } from '@/lib/discounts/discountMath'
+import { createClient } from '@/lib/supabase/server'
 import type { CartItem } from '@/lib/cart/types'
 
 // Reads secrets at runtime and talks to Mercado Pago, so it must never be
@@ -8,7 +11,7 @@ import type { CartItem } from '@/lib/cart/types'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
-  let body: { items?: CartItem[]; email?: string }
+  let body: { items?: CartItem[]; email?: string; code?: string }
   try {
     body = await request.json()
   } catch {
@@ -30,11 +33,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Checkout no configurado' }, { status: 500 })
   }
 
+  let finalItems = items
+  const code = typeof body.code === 'string' ? body.code : ''
+  if (code) {
+    const supabase = await createClient()
+    const validated = await validateDiscountCode(supabase, code)
+    if (validated) {
+      finalItems = applyDiscountToItems(items, validated.percent).items
+    }
+    // invalid code → silently ignore (no discount); the page already previews validity
+  }
+
   try {
     const client = new MercadoPagoConfig({ accessToken })
     const preference = new Preference(client)
     const result = await preference.create({
-      body: buildPreference({ items, email, siteUrl }),
+      body: buildPreference({ items: finalItems, email, siteUrl }),
     })
     return NextResponse.json({ id: result.id, init_point: result.init_point })
   } catch (err) {
