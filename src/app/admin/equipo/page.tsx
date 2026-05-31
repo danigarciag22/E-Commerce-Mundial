@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getTeam } from '@/lib/team/getTeam'
 import { updateMemberRoleAction } from '@/lib/team/teamActions'
 import { ROLE_LABELS, TEAM_ROLES, type UserRole } from '@/lib/auth/roles'
+import { Avatar } from '@/components/admin/Avatar'
 
 const ASSIGNABLE: UserRole[] = [...TEAM_ROLES, 'customer']
 
@@ -22,7 +23,7 @@ export default async function TeamPage() {
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr>
-              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Email</th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Miembro</th>
               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Rol</th>
               <th className="px-3 py-2" />
             </tr>
@@ -30,7 +31,15 @@ export default async function TeamPage() {
           <tbody>
             {team.map((m) => (
               <tr key={m.id} className="border-b border-border last:border-0">
-                <td className="px-3 py-2.5 font-medium">{m.email}{m.id === me.id && <span className="ml-2 text-xs text-muted-foreground">(tú)</span>}</td>
+                <td className="px-3 py-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <Avatar name={m.name} email={m.email} src={m.avatarUrl} size={32} />
+                    <div className="flex flex-col">
+                      <span className="font-medium">{m.name ?? m.email}{m.id === me.id && <span className="ml-2 text-xs text-muted-foreground">(tú)</span>}</span>
+                      {m.name && <span className="text-xs text-muted-foreground">{m.email}</span>}
+                    </div>
+                  </div>
+                </td>
                 <td className="px-3 py-2.5">{ROLE_LABELS[m.role]}</td>
                 <td className="px-3 py-2.5">
                   <form action={updateMemberRoleAction} className="flex items-center gap-2">
