@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test('catalog shows products and filters by category', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: /Tienda Mundial 2026/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Catálogo' })).toBeVisible()
   const firstCard = page.locator('a[href^="/productos/"]').first()
   await expect(firstCard).toBeVisible()
   await page.getByRole('link', { name: 'Balones' }).click()
