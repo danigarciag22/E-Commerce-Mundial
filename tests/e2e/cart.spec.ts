@@ -7,9 +7,9 @@ test('add a product to cart and manage it on the cart page', async ({ page }) =>
 
   await page.getByRole('button', { name: /Agregar al carrito/i }).click()
 
-  // CartButton aria-label is "Carrito" (no items) or "Carrito, N artículos" (with items)
-  // getByRole uses the accessible name (aria-label), so /Carrito/i matches both states
-  await page.getByRole('link', { name: /Carrito/i }).click()
+  // CartButton aria-label is "Carrito" (no items) or "Carrito, N artículos" (with items).
+  // Scope to the header so the footer's "Carrito" link doesn't cause a strict-mode clash.
+  await page.getByRole('banner').getByRole('link', { name: /Carrito/i }).click()
   await expect(page).toHaveURL(/\/carrito/)
   await expect(page.getByRole('heading', { name: /Tu carrito/i })).toBeVisible()
   await expect(page.getByRole('button', { name: /Quitar/i })).toBeVisible()
