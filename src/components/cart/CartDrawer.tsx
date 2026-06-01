@@ -69,10 +69,13 @@ export function CartDrawer() {
   const remaining = freeShippingRemaining(subtotal)
   const progress = freeShippingProgress(subtotal)
 
-  // Cross-sell: a few active products loaded lazily when the drawer opens.
+  // Cross-sell: a few active products loaded lazily once, the first time the
+  // drawer opens (the `loaded` flag prevents re-fetching when the result set
+  // is empty).
   const [related, setRelated] = useState<Product[]>([])
+  const [loaded, setLoaded] = useState(false)
   useEffect(() => {
-    if (!open || related.length > 0) return
+    if (!open || loaded) return
     const supabase = createClient()
     supabase
       .from('products')
@@ -80,6 +83,7 @@ export function CartDrawer() {
       .eq('active', true)
       .limit(8)
       .then(({ data }) => {
+        setLoaded(true)
         if (data) {
           setRelated(
             data.map((r) => ({
@@ -95,7 +99,7 @@ export function CartDrawer() {
           )
         }
       })
-  }, [open, related.length])
+  }, [open, loaded])
 
   const inCart = new Set(items.map((i) => i.id))
   const crossSell = related.filter((p) => !inCart.has(p.id)).slice(0, 4)

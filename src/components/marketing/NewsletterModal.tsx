@@ -27,11 +27,21 @@ export function NewsletterModal() {
   const [copied, setCopied] = useState(false)
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Show once, a few seconds after load, only if not yet resolved.
+  // Show once, a few seconds after load, only if not yet resolved — and never
+  // stacked on top of another open dialog (auth modal / cart drawer). If one is
+  // open, retry shortly so the offer still appears once it's dismissed.
   useEffect(() => {
     if (!hydrated || status !== 'idle') return
-    const t = setTimeout(() => setOpen(true), SHOW_DELAY_MS)
-    return () => clearTimeout(t)
+    let timer: ReturnType<typeof setTimeout>
+    const tryOpen = () => {
+      if (document.querySelector('[role="dialog"], [role="alertdialog"]')) {
+        timer = setTimeout(tryOpen, 3000)
+        return
+      }
+      setOpen(true)
+    }
+    timer = setTimeout(tryOpen, SHOW_DELAY_MS)
+    return () => clearTimeout(timer)
   }, [hydrated, status])
 
   useEffect(() => () => { if (copyTimer.current) clearTimeout(copyTimer.current) }, [])
